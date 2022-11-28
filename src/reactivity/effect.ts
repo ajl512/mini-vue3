@@ -1,7 +1,7 @@
 let activeEffect;
 class ReactiveEffect {
   private _fn: any;
-  constructor(fn) {
+  constructor(fn, public scheduler?) {
     this._fn = fn;
   }
   run() {
@@ -40,12 +40,16 @@ export function trigger(target, key) {
   // 遍历set结构
   // 1. for/of; // 2. forEach; // 3. deps.values
   for (const effect of deps) {
-    effect.run()
+    if (effect.scheduler) {
+      effect.scheduler()
+    } else {
+      effect.run()
+    }
   }
 }
-export function effect(fn) {
+export function effect(fn, options: any = {}) {
+  const _effect = new ReactiveEffect(fn, options.scheduler)
   // 进来就要先执行一次
-  const _effect = new ReactiveEffect(fn)
   _effect.run()
 
   return _effect.run.bind(_effect)
