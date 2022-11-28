@@ -7,7 +7,7 @@ class ReactiveEffect {
   run() {
     // activeEffect附值必须在调用之前； 否则在触发依赖收集时，拿到的当前执行体为undefined
     activeEffect = this
-    this._fn()
+    return this._fn()
   }
 }
 
@@ -47,4 +47,6 @@ export function effect(fn) {
   // 进来就要先执行一次
   const _effect = new ReactiveEffect(fn)
   _effect.run()
+
+  return _effect.run.bind(_effect)
 }
