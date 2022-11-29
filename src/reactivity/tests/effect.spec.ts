@@ -1,5 +1,5 @@
 import { reactive } from '../reactive';
-import { effect } from '../effect';
+import { effect, stop } from '../effect';
 describe('effect', () => {
   it('happy path', () => {
     const user = reactive({
@@ -59,5 +59,43 @@ describe('effect', () => {
     expect(dummy).toBe(1);
     run();
     expect(dummy).toBe(2);
+  })
+
+  it('stop', () => {
+    let dummy;
+    const obj = reactive({ prop: 1 })
+    const runner = effect(() => {
+      dummy = obj.prop;
+    })
+    // effect 开始就会执行一次fn,并返回runner
+    expect(dummy).toBe(1);
+    // set时，触发fn执行 重新给dummy赋值
+    obj.prop = 2;
+    expect(dummy).toBe(2);
+    // // 调用stop后，再执行set操作，触发trigger,时，不再有更新该effect
+    stop(runner)
+    obj.prop = 3;
+    expect(dummy).toBe(2);
+    // // stop effect should still be munually be callable
+    runner()
+    expect(dummy).toBe(3);
+  })
+
+  it('onStop', () => {
+    let dummy;
+    const obj = reactive({
+      foo: 1
+    })
+    const onStop = jest.fn();
+    const runner = effect(
+      () => {
+        dummy = obj.foo
+      },
+      {
+        onStop
+      }
+    )
+    stop(runner)
+    expect(onStop).toBeCalledTimes(1)
   })
 })

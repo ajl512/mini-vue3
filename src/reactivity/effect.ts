@@ -1,6 +1,11 @@
+import { extend } from "../shared";
+
 let activeEffect;
 class ReactiveEffect {
   private _fn: any;
+  deps = [];
+  active = true;
+  onStop?: () => void;
   constructor(fn, public scheduler?) {
     this._fn = fn;
   }
@@ -9,6 +14,21 @@ class ReactiveEffect {
     activeEffect = this
     return this._fn()
   }
+  stop () {
+    if (this.active) {
+      cleanupEffect(this)
+      this.active = false
+      if (this.onStop) {
+        this.onStop()
+      }
+    }
+  }
+}
+
+function cleanupEffect(effect) {
+  effect.deps.forEach((dep: any) => {
+    dep.delete(effect)
+  })
 }
 
 const targetsMap = new Map();
@@ -18,19 +38,22 @@ const targetsMap = new Map();
 // map结构的[['target1', ['key', set(fn1,fn2)]], ['target2', ['key', set(fn1,fn2)]]]
 // 依赖收集
 export function track(target, key) {
+  // target -> key -> deps
   let depsMap = targetsMap.get(target);
   if (!depsMap) {
     depsMap = new Map();
     targetsMap.set(target, depsMap)
   }
-  let deps = depsMap.get(key);
-  if (!deps) {
-    deps = new Set();
-    depsMap.set(key, deps)
+  let dep = depsMap.get(key);
+  if (!dep) {
+    dep = new Set();
+    depsMap.set(key, dep)
   }
 
+  if (!activeEffect) return
   // 将依赖执行体收集起来
-  deps.add(activeEffect)
+  dep.add(activeEffect)
+  activeEffect.deps.push(dep)
 }
 
 // 触发依赖
@@ -49,8 +72,15 @@ export function trigger(target, key) {
 }
 export function effect(fn, options: any = {}) {
   const _effect = new ReactiveEffect(fn, options.scheduler)
+  extend(_effect, options)
   // 进来就要先执行一次
   _effect.run()
 
-  return _effect.run.bind(_effect)
+  const runner: any = _effect.run.bind(_effect)
+  runner.effect = _effect
+  return runner
+}
+
+export function stop(runner) {
+  runner.effect.stop()
 }
