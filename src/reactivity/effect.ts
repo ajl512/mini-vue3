@@ -42,18 +42,19 @@ function cleanupEffect(effect) {
   effect.deps.forEach((dep: any) => {
     dep.delete(effect)
   })
+  effect.deps.length = 0
 }
 
 const targetsMap = new Map();
 function isTracking() {
-  return activeEffect && !shouldTrack
+  return shouldTrack && activeEffect !== undefined
 }
 // target -> key -> dep依赖收集的容器用来存放传入的fn
 // 因为fn不能重复，所以dep应该是set结构
 // map结构的[['target1', ['key', set(fn1,fn2)]], ['target2', ['key', set(fn1,fn2)]]]
 // 依赖收集
 export function track(target, key) {
-  if (isTracking()) return
+  if (!isTracking()) return
   // target -> key -> deps
   let depsMap = targetsMap.get(target);
   if (!depsMap) {
@@ -67,6 +68,7 @@ export function track(target, key) {
   }
 
   // 将依赖执行体收集起来
+  if (dep.has(activeEffect)) return
   dep.add(activeEffect)
   activeEffect.deps.push(dep)
 }
