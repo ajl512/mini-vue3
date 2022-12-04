@@ -74,7 +74,12 @@ describe('effect', () => {
     expect(dummy).toBe(2);
     // // 调用stop后，再执行set操作，触发trigger,时，不再有更新该effect
     stop(runner)
-    obj.prop = 3;
+    // obj.prop = 3;
+    // expect(dummy).toBe(2);
+
+    // 改成obj.prop++; 实际是obj.prop = obj.prop + 1; 就会有先触发get，进行依赖收集，再进行set,进行trigger中执行fn
+    // 所以需要stop，清除掉依赖后后； 再触发get时，不让再进行依赖收集，那么trigger时，也不会再出现白白清理的情况
+    obj.prop++
     expect(dummy).toBe(2);
     // // stop effect should still be munually be callable
     runner()
