@@ -1,4 +1,4 @@
-import { isReactive, reactive } from '../reactive';
+import { isReactive, reactive, isProxy } from '../reactive';
 describe('reactive', () => {
   it("happy path", () => {
     const original = { a: 1 };
@@ -15,5 +15,6 @@ describe('reactive', () => {
     expect(isReactive(obveserd.user)).toBe(true)
     expect(isReactive(obveserd.array)).toBe(true)
     expect(isReactive(obveserd.array[0])).toBe(true)
+    expect(isProxy(obveserd)).toBe(true)
   })
 })

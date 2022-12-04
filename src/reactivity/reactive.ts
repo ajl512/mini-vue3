@@ -28,8 +28,12 @@ export function isReactive(obj) {
   return !!obj[ReactiveFlags.IS_REACTIVE]
 }
 
-export function isReadonly(obj) {
-  return !!obj[ReactiveFlags.IS_READONLY]
+export function isReadonly(val) {
+  return !!val[ReactiveFlags.IS_READONLY]
+}
+
+export function isProxy(raw) {
+  return isReactive(raw) || isReadonly(raw)
 }
 
 // 判断对象是否是isReactive和isReadonly，首先如果不是proxy不能触发get,那就肯定不属于了； 其次再在get中判断属于哪一种proxy
