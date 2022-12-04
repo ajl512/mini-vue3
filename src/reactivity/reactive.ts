@@ -1,4 +1,4 @@
-import { mutableHandles, readonlyHandles } from './basiHandle';
+import { mutableHandles, readonlyHandles, shallowReadonlyHandles } from './basiHandle';
 
 // 取名另类 内置属性
 export enum ReactiveFlags {
@@ -16,6 +16,10 @@ export function reactive(raw) {
 
 export function readonly(raw) {
   return createActiveObject(raw, readonlyHandles)
+}
+
+export function shallowReadonly(raw) {
+  return createActiveObject(raw, shallowReadonlyHandles)
 }
 
 export function isReactive(obj) {
