@@ -46,7 +46,7 @@ function cleanupEffect(effect) {
 }
 
 const targetsMap = new Map();
-function isTracking() {
+export function isTracking() {
   return shouldTrack && activeEffect !== undefined
 }
 // target -> key -> dep依赖收集的容器用来存放传入的fn
@@ -68,6 +68,10 @@ export function track(target, key) {
   }
 
   // 将依赖执行体收集起来
+  trackEffects(dep)
+}
+
+export function trackEffects(dep) {
   if (dep.has(activeEffect)) return
   dep.add(activeEffect)
   activeEffect.deps.push(dep)
@@ -76,10 +80,14 @@ export function track(target, key) {
 // 触发依赖
 export function trigger(target, key) {
   const depsMap = targetsMap.get(target)
-  const deps = depsMap.get(key)
+  const dep = depsMap.get(key)
+  triggerEffets(dep)
+}
+
+export function triggerEffets(dep) {
   // 遍历set结构
   // 1. for/of; // 2. forEach; // 3. deps.values
-  for (const effect of deps) {
+  for (const effect of dep) {
     if (effect.scheduler) {
       effect.scheduler()
     } else {
