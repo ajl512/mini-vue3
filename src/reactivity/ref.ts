@@ -6,6 +6,7 @@ class RefTemf {
   private _value: any;
   public _dep: Set<unknown>;
   private _originRaw: any;
+  public __v_isRef_ = true
   constructor(value) {
     // 如果传过来的value是对象，那么就需要用reactive包裹
     this._originRaw = value
@@ -41,4 +42,12 @@ function convert(value) {
 
 export function ref(val) {
   return new RefTemf(val)
+}
+
+export function isRef(ref) {
+  return !!ref.__v_isRef_
+}
+
+export function unRef(ref) {
+  return isRef(ref) ? ref.value : ref
 }
