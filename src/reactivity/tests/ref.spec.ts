@@ -55,5 +55,6 @@ describe('ref', () => {
     const a = ref(1)
     expect(a.value).toBe(1)
     expect(unRef(a)).toBe(1)
+    expect(unRef(1)).toBe(1)
   })
 })
