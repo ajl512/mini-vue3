@@ -1,4 +1,5 @@
 import { mutableHandles, readonlyHandles, shallowReadonlyHandles } from './basiHandle';
+import { isRef, ref, unRef } from './ref';
 
 // 取名另类 内置属性
 export enum ReactiveFlags {
@@ -32,8 +33,22 @@ export function isReadonly(val) {
   return !!val[ReactiveFlags.IS_READONLY]
 }
 
+// 判断对象是否是isProxy,就是判断是否是isReactive和isReadonly，首先如果不是proxy不能触发get,那就肯定不属于了； 其次再在get中判断属于哪一种proxy
 export function isProxy(raw) {
   return isReactive(raw) || isReadonly(raw)
 }
 
-// 判断对象是否是isReactive和isReadonly，首先如果不是proxy不能触发get,那就肯定不属于了； 其次再在get中判断属于哪一种proxy
+export function proxyRefs(objectWidthRefs) {
+return new Proxy(objectWidthRefs, {
+  get(target, key) {
+    return unRef(Reflect.get(target, key))
+  },
+  set(target, key, value) {
+    if (isRef(target[key]) && !isRef(value)) {
+      return target[key].value = value
+    } else {
+      return target[key] = value
+    }
+  }
+})
+}
