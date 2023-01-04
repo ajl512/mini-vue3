@@ -5,7 +5,17 @@ export const App = {
   // 这里暂时不考虑这个 我们用render函数‘ template最终其实也会被编译成render函数被其处理
   render() {
     // 返回虚拟节点
-    return h('div',this.msg)
+    return h('div',{
+      id: 'root',
+      class: ['red', 'blue']
+    },
+    // 'hi,' +  'mini-vue'
+    [
+      h("p", { class: 'red'}, "hi"),
+      h("p", { class: 'blue'}, "mini-vue"),
+
+    ]
+    )
   },
   setup() {
     return {
