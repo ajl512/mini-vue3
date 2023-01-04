@@ -22,14 +22,15 @@ function processComponent(vnode: any, container: any) {
   mountComponent(vnode, container)
 }
 
-function mountComponent(vnode: any, container) {
-    const instance = createComponentInstance(vnode)
+// initialVNode表示初始化的虚拟节点
+function mountComponent(initialVNode: any, container) {
+    const instance = createComponentInstance(initialVNode)
 
     setupComponent(instance)
-    setupRenderEffect(instance, vnode, container)
+    setupRenderEffect(instance, initialVNode, container)
 }
 
-function setupRenderEffect(instance, vnode, container) {
+function setupRenderEffect(instance, initialVNode, container) {
   const { proxy } = instance
   // 不用proxy代理劫持时，调用render,里面的this.msg中的this指向instance,要拿msg，就得是this.setupState.msg才行； 为了方便操作
   // 用proxy代理劫持，只要是获取值时，就从setupState中获取
@@ -47,7 +48,7 @@ function setupRenderEffect(instance, vnode, container) {
   patch(subTree, container)
   // 处理时机应该是所有的element类型都被mount之后
   // subTree是组件实例调用render所得，是当前render-> this，而不是里面嵌套的
-  vnode.el = subTree.el
+  initialVNode.el = subTree.el
 }
 
 function processElement(vnode: any, container: any) {
