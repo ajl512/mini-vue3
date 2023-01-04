@@ -29,7 +29,10 @@ function mountComponent(vnode: any, container) {
 }
 
 function setupRenderEffect(instance, container) {
-  const subTree = instance.render()
+  const { proxy } = instance
+  // 不用proxy代理劫持时，调用render,里面的this.msg中的this指向instance,要拿msg，就得是this.setupState.msg才行； 为了方便操作
+  // 用proxy代理劫持，只要是获取值时，就从setupState中获取
+  const subTree = instance.render.call(proxy)
   // subTree 就是 h('div',this.msg)
   // 基于虚拟节点
   // vnode -> patch
@@ -50,6 +53,7 @@ function mountElement(vnode: any, container: any) {
   // el.textContent = 'hi mini-vue'
 
   // document.body.appendChild(el);
+
   const { type, props, children } = vnode
   const el = document.createElement(type) // type
   for (const key in props) {

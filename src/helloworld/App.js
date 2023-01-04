@@ -9,17 +9,16 @@ export const App = {
       id: 'root',
       class: ['red', 'blue']
     },
-    // 'hi,' +  'mini-vue'
-    [
-      h("p", { class: 'red'}, "hi"),
-      h("p", { class: 'blue'}, "mini-vue"),
-
-    ]
+    'hi,' +  this.msg
+    // [
+    //   h("p", { class: 'red'}, "hi"),
+    //   h("p", { class: 'blue'}, "mini-vue"),
+    // ]
     )
   },
   setup() {
     return {
-      msg: 'mini-vue'
+      msg: 'mini-vue 哈哈哈'
     }
   },
 }
