@@ -1,5 +1,5 @@
 import { h } from '../../lib/guide-mini-vue.esm.js'
-
+import { Foo } from './Foo.js'
 window.self = null
 export const App = {
   // 平时我们写的是.vue类的文件 <template></template>
@@ -21,6 +21,7 @@ export const App = {
     [
       h("p", { class: 'red'}, "hi"),
       h("p", { class: 'blue'}, "mini-vue"),
+      h(Foo, { count: 1 }),
     ]
     )
   },
