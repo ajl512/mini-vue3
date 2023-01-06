@@ -1,3 +1,5 @@
+import { isObject } from "../shared/index";
+import { ShapeFlags } from "../shared/shapeFlags";
 import { createComponentInstance, setupComponent } from "./component"
 import { createVNode } from "./vnode";
 
@@ -7,12 +9,13 @@ export function render(vnode, container) {
 }
 
 function patch(vnode, container) {
+    const { shapeFlag } = vnode;
     // 去处理组件
     // 判断虚拟节点类型 preocessComponent / processElement
     // 判断是不是element
-    if (typeof vnode.type === "string") {
+    if (shapeFlag & ShapeFlags.ELEMENT) {
       processElement(vnode, container);
-    } else if (typeof vnode.type === 'object') {
+    } else if (shapeFlag & ShapeFlags.STATEFUL_COMPONENT) {
       processComponent(vnode, container)
     }
 
@@ -65,7 +68,7 @@ function mountElement(vnode: any, container: any) {
 
   // document.body.appendChild(el);
 
-  const { type, props, children } = vnode
+  const { type, props, children, shapeFlag } = vnode
   // 尝试将el存储起来 有多个h会有多个el; 但是只有type为div,id为root的才是render的得到的第一层里的el会被最终$el读取
   const el = (vnode.el =  document.createElement(type)) // type
   console.log('赋值给vnode', vnode, vnode.el)
@@ -73,9 +76,9 @@ function mountElement(vnode: any, container: any) {
     const val = props[key]
     el.setAttribute(key, val)
   }
-  if (typeof children === 'string') {
+  if (shapeFlag & ShapeFlags.TEXT_CHILDREN) {
     el.textContent = children
-  } else if (Array.isArray(children)) {
+  } else if (shapeFlag & ShapeFlags.ARRAY_CHILDREN) {
     mountChildren(vnode, el)
   }
 
