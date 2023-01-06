@@ -71,10 +71,17 @@ function mountElement(vnode: any, container: any) {
   const { type, props, children, shapeFlag } = vnode
   // 尝试将el存储起来 有多个h会有多个el; 但是只有type为div,id为root的才是render的得到的第一层里的el会被最终$el读取
   const el = (vnode.el =  document.createElement(type)) // type
-  console.log('赋值给vnode', vnode, vnode.el)
   for (const key in props) {
     const val = props[key]
-    el.setAttribute(key, val)
+    // 注册事件 onClick-> click-> addEventListener('click',val); onMousedown -> mousedown
+    // 所以看是否是on+大写字母开头的 就是注册事件；
+    const isOn =(key: string): boolean => /^on[A-Z]/.test(key)
+    if (isOn(key)) {
+      const event = key.slice(2).toLowerCase()
+      el.addEventListener(event,val)
+    } else {
+      el.setAttribute(key, val)
+    }
   }
   if (shapeFlag & ShapeFlags.TEXT_CHILDREN) {
     el.textContent = children

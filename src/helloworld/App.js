@@ -10,7 +10,10 @@ export const App = {
     // 返回虚拟节点
     return h('div',{
       id: 'root',
-      class: ['red', 'blue']
+      class: ['red', 'blue'],
+      onClick() {
+        console.log('on tap click')
+      }
     },
     // setupState
     // 'hi,' +  this.msg
