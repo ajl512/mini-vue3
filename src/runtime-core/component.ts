@@ -1,4 +1,5 @@
 import { shallowReadonly } from "../reactivity/reactive"
+import { emit } from "./componentEmit"
 import { initProps } from "./componentProps"
 import { PublicInstanceProxyHandler } from "./componentPublicIinstance"
 
@@ -8,8 +9,10 @@ export function createComponentInstance(vnode: any) {
     type: vnode.type,
     setupState: {},
     props: {},
+    emit: () => {},
   }
 
+  component.emit = emit.bind(null, component) as any
   return component
 }
 
@@ -51,8 +54,9 @@ function setupStatefulComponent(instance) {
     // setup可以返回function 也可以返回object
     // 如果返回function 就说明返回的也是一个render函数。
     // 如果是object 就把该对象注入的组件的上下文中
-
-    const setupResult = setup(shallowReadonly(instance.props))
+    const setupResult = setup(shallowReadonly(instance.props), {
+      emit: instance.emit,
+    })
     handleSetupResult(instance, setupResult)
   }
 }

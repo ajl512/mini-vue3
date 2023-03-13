@@ -21,7 +21,10 @@ export const App = {
     [
       h("p", { class: 'red'}, "hi"),
       h("p", { class: 'blue'}, "mini-vue"),
-      h(Foo, { count: 1 }),
+      h(Foo, {
+        onAdd(a, b) {
+          console.log('a, b', a, b)
+      } }, 'xxx'),
     ]
     )
   },
